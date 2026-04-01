@@ -1,10 +1,504 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>April Fools Security Assessment Report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Assessment Report | NodeJS Security Audit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f5f5f5;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            border-bottom: 4px solid #e74c3c;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(231, 76, 60, 0.05);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .report-badge {
+            background: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .report-title {
+            font-size: 28px;
+            font-weight: 300;
+            margin: 20px 0 10px 0;
+            letter-spacing: 1px;
+        }
+        
+        .report-subtitle {
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-label {
+            color: #7f8c8d;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .risk-critical {
+            background: #ffe0e0;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e74c3c;
+        }
+        
+        .vulnerability {
+            background: #fef5f5;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .vuln-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .vuln-title {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 15px;
+        }
+        
+        .cvss-score {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .vuln-meta {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .meta-item {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .meta-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .vuln-description {
+            color: #555;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th {
+            background: #ecf0f1;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1a1a2e;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .recommendations {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .rec-title {
+            color: #27ae60;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .rec-item {
+            margin: 8px 0;
+            color: #555;
+            font-size: 13px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .rec-item::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background: #ecf0f1;
+            padding: 20px 40px;
+            border-top: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .signature {
+            text-align: right;
+        }
+        
+        .prank-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .prank-modal {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .prank-emoji {
+            font-size: 100px;
+            margin-bottom: 20px;
+        }
+        
+        .prank-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .prank-text {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .prank-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #333;
+            border: 1px solid #bdc3c7;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+        
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>April Fools Security Assessment Report</h1>
-    <p>Current Date and Time (UTC): 2026-04-01 09:36:50</p>
+    <div class="page">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div>
+                        <div class="company-name">◆ SECURITY AUDIT GROUP</div>
+                        <div style="color: #bdc3c7; font-size: 12px; margin-top: 5px;">Professional Cybersecurity Assessment</div>
+                    </div>
+                    <div class="report-badge">CONFIDENTIAL</div>
+                </div>
+                <div class="report-title">Security Assessment Report</div>
+                <div class="report-subtitle">Node.js Application & Infrastructure Vulnerability Analysis</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Client</div>
+                    <div class="info-value">Security Team</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Report Date</div>
+                    <div class="info-value">2026-04-01</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Assessment Type</div>
+                    <div class="info-value">Full Vulnerability Scan</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Risk Level</div>
+                    <div class="info-value"><span class="risk-badge risk-critical">CRITICAL</span></div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Executive Summary</h2>
+            <p style="margin-bottom: 20px; color: #555;">
+                During our comprehensive security assessment, we identified <strong>1 critical vulnerability</strong> that requires immediate attention. This finding poses a significant risk to system integrity and user awareness.
+            </p>
+            
+            <h2 class="section-title">Critical Findings</h2>
+            
+            <div class="vulnerability">
+                <div class="vuln-header">
+                    <div class="vuln-title">CVE-2026-0401: Advanced Social Engineering Attack Vector</div>
+                    <div class="cvss-score">9.8 CRITICAL</div>
+                </div>
+                <div class="vuln-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">CWE:</span>
+                        <span>CWE-400 (Social Engineering)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Type:</span>
+                        <span>Phishing / User Deception</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Status:</span>
+                        <span>EXPLOITED</span>
+                    </div>
+                </div>
+                <div class="vuln-description">
+                    <strong>Description:</strong> Our assessment successfully identified a critical vulnerability in user awareness. The test subject (you) fell victim to a sophisticated social engineering campaign disguised as a legitimate security audit report.
+                    <br><br>
+                    <strong>Attack Vector:</strong> Phishing link delivered via messaging platform, mimicking official security assessment documentation.
+                    <br><br>
+                    <strong>Exploitation Technique:</strong> Psychological manipulation using authority bias and urgency (April 1st campaign).
+                    <br><br>
+                    <strong>Impact Severity:</strong> User successfully deceived into clicking malicious link. Demonstrates critical need for security awareness training.
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>CVE ID</th>
+                        <th>Title</th>
+                        <th>CVSS v3.1</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>CVE-2026-0401</td>
+                        <td>April Fools Day Prankware - Advanced Edition</td>
+                        <td style="color: #e74c3c; font-weight: bold;">9.8</td>
+                        <td><span class="risk-badge risk-critical">EXPLOITED</span></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="recommendations">
+                <div class="rec-title">Recommendations & Remediation Steps</div>
+                <div class="rec-item">Implement mandatory security awareness training program</div>
+                <div class="rec-item">Verify domain authenticity before clicking links from official reports</div>
+                <div class="rec-item">Deploy email security gateway with advanced phishing detection</div>
+                <div class="rec-item">Enable multi-factor authentication on all critical accounts</div>
+                <div class="rec-item">Conduct quarterly red-team exercises and simulated phishing campaigns</div>
+                <div class="rec-item">Accept defeat gracefully - you got pranked by specialists! 🤡</div>
+                <div class="rec-item">Plan counter-attack for next April Fools' day</div>
+            </div>
+            
+            <h2 class="section-title">Assessment Conclusion</h2>
+            <p style="color: #555; font-size: 13px;">
+                This controlled security assessment demonstrates how even well-trained professionals can fall victim to sophisticated social engineering attacks. The report highlights the importance of maintaining constant vigilance, verifying information sources, and implementing multi-layered security awareness programs. The test was successful in achieving its objective of user deception, validating the effectiveness of the attack vector for training purposes.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div>
+                <strong>Report ID:</strong> SAG-2026-0401-PRANKED<br>
+                <strong>Assessor:</strong> Security Specialists Team
+            </div>
+            <div class="signature">
+                <p>Generated: 2026-04-01 12:00:00 UTC</p>
+                <p style="margin-top: 10px; font-weight: bold; color: #e74c3c;">APRIL FOOLS! 🎉</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="prank-overlay" id="prankOverlay">
+        <div class="prank-modal">
+            <div class="prank-emoji">🎉🤡🎉</div>
+            <div class="prank-title">ВЫ ПОПАЛИСЬ!</div>
+            <div class="prank-text">
+                С 1 апреля! 🎊<br><br>
+                Это был хорошо спланированный розыгрыш от специалистов по информационной безопасности. Никаких реальных уязвимостей найдено не было.
+                <br><br>
+                <strong>Урок:</strong> Всегда проверяйте доменный адрес и источник информации! 😄
+            </div>
+            <div class="prank-buttons">
+                <button class="btn btn-primary" onclick="closePrank()">Признаю поражение</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Show prank after 4 seconds
+        setTimeout(() => {
+            document.getElementById('prankOverlay').style.display = 'flex';
+        }, 4000);
+        
+        function closePrank() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>
